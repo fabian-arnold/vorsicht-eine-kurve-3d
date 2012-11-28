@@ -50,19 +50,19 @@ int WINAPI WinMain (HINSTANCE hInstance,
     wc.hCursor = LoadCursor (NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH) GetStockObject (BLACK_BRUSH);
     wc.lpszMenuName = NULL;
-    wc.lpszClassName = "Facharbeit";
+    wc.lpszClassName = "visorgames";
     RegisterClass (&wc);
 
     /* create main window */
     hWnd = CreateWindow (
-      "Facharbeit", "Zellulärer Automat 3D", 
+      "visorgames", "Vorsicht eine Kurve - 3D", 
       WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
       0, 0, width, height,
       NULL, NULL, hInstance, NULL);
 
     /* enable OpenGL for the window */
     EnableOpenGL (hWnd, &hDC, &hRC);
-	Renderer::Init();
+	//Renderer::Init();
     /* program main loop */
     while (!bQuit)
     {
@@ -84,9 +84,10 @@ int WINAPI WinMain (HINSTANCE hInstance,
         {
             /* OpenGL animation code goes here */
 
-            glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
+           
             
 			Renderer::doRender();
+
             SwapBuffers (hDC);
 
             //Sleep (1);
@@ -168,14 +169,14 @@ void EnableOpenGL (HWND hWnd, HDC *hDC, HGLRC *hRC)
     *hRC = wglCreateContext( *hDC );
     wglMakeCurrent( *hDC, *hRC );
     
-   	glClearColor( 0.0, 0.0, 0.0, 0.0 );
+  /* 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 
 	glViewport( 0, 0, width, height );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 	
 	gluPerspective(45.0,width/(double)height,0.00001,100.0);
-	
+
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	
@@ -183,7 +184,31 @@ void EnableOpenGL (HWND hWnd, HDC *hDC, HGLRC *hRC)
 	glEnable(GL_DEPTH_TEST);            // Enables Depth Testing
 	glDepthFunc(GL_LEQUAL);             // The Type Of Depth Test To Do
     
-    
+    */
+
+	glClearColor(1.0, 0.0, 0.0, 0.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0);
+
+	// Lighting set up
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	// Set lighting intensity and color
+	GLfloat qaAmbientLight[]	= {0.2, 0.2, 0.2, 1.0};
+	GLfloat qaDiffuseLight[]	= {0.8, 0.8, 0.8, 1.0};
+	GLfloat qaSpecularLight[]	= {1.0, 1.0, 1.0, 1.0};
+	glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
+
+	
+	glMatrixMode(GL_MODELVIEW);
+
+
+	Renderer::Init();
 
 }
 

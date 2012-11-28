@@ -1,4 +1,4 @@
-#include "Renderer.h"
+ï»¿#include "Renderer.h"
 #include <iostream>
 #include <Windows.h>
 #include <vfw.h>
@@ -15,7 +15,7 @@ GLuint theMotionTex;
 using namespace std;
 void initMotionBlur()
 {
-    //Textur in Bildschirmgrösse
+    //Textur in BildschirmgrÃ¶sse
     int texSize = WINWIDTH * WINHEIGHT * 3;
     float* motionTex = new float[texSize];
  
@@ -34,50 +34,7 @@ void initMotionBlur()
  	
     delete [] motionTex;
 }
-int nr = 0;
-void RenderToFile(){
-	GLint m_viewport[4];
-	glGetIntegerv( GL_VIEWPORT, m_viewport );
-	int width  = m_viewport[2];
-	int height =  m_viewport[3];
-	 
-	GLuint texture;
-	glGenTextures( 1, &texture );
-	glBindTexture(GL_TEXTURE_2D, texture);
-	 
-	// rgb image
-	glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGB,m_viewport[0],
-	        m_viewport[1], m_viewport[2], m_viewport[3],0);
-	 
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	BYTE *raw_img = (BYTE*) malloc(sizeof(BYTE) * width * height * 3);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, raw_img);
-	//ofstream myfile;
-  	//myfile.open ("example.txt");
-	//  myfile.
-	stringstream ss;
-	ss << "image"<< nr<<".crw";
-	 FILE * pFile;
-    
-	 pFile = fopen ( ss.str().c_str() , "wb" );
-	 fwrite(raw_img , 1 , sizeof(BYTE) * width * height * 3 , pFile );
-	 fclose (pFile);
-	 nr++;
-	
-/*	for(int x = 0; x < width; x++){
-		for(int y = 0; y < height; y++){
-			char r,g,b;
-			r = raw_img[(x*height*3)+(y*3)+0];
-			g = raw_img[(x*height*3)+(y*3)+1];
-			b = raw_img[(x*height*3)+(y*3)+2];
-			
-			myfile << "R: "<< r <<"\n";
-			myfile << "G: "<< g <<"\n";
-			myfile << "B: "<< b <<"\n";
-		}
-	}+/
-	myfile.close();*/
-}
+
 
 
 void beginInfoScreen( int winwidth, int winheight )
@@ -116,8 +73,6 @@ void screenQuad()
             glVertex2i( 0, WINHEIGHT );
         glEnd();
     endInfoScreen();
-    
-    RenderToFile();
 }
 
  
@@ -131,10 +86,10 @@ void beginMotionBlur()
  
     glDepthMask( false );
  
-    //Motion-Faktor als Alpha-Faktor übergeben, Wert abhängig von Framerate ( z.B. 0.98 )
+    //Motion-Faktor als Alpha-Faktor Ã¼bergeben, Wert abhÃ¤ngig von Framerate ( z.B. 0.98 )
     glColor4d( 1.0f, 1.0f, 1.0f, 0.0f );
  
-    //Motion-Textur über Szene blenden
+    //Motion-Textur Ã¼ber Szene blenden
     glBindTexture( GL_TEXTURE_2D, theMotionTex );
     screenQuad();	
  
@@ -146,7 +101,7 @@ void beginMotionBlur()
  
 void endMotionBlur()
 {
-    //Bildschirm zurück in Textur kopieren
+    //Bildschirm zurÃ¼ck in Textur kopieren
     glEnable( GL_TEXTURE_2D );
     glBindTexture( GL_TEXTURE_2D, theMotionTex );
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, WINWIDTH, WINHEIGHT);
@@ -162,89 +117,107 @@ Die welt :
 http://wiki.delphigl.com/index.php/Motion-Blur
 
 */
-float scale = 0.0f;
-#define SIZE 100
-vector<vector<vector<char> > > world;
-double angle;
+void SetUpLightning(){
+	// Somewhere in the initialization part of your programm
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	
+	// Create light components
+	GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
+	GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	
+
+	// Assign created components to GL_LIGHT0
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+
+	
+
+}
 void Renderer::Init(){
-	initMotionBlur();
-	world.resize(SIZE);
-	for(int x = 0; x < SIZE; x++){
-		world[x].resize(SIZE);
-	    for(int y = 0; y < SIZE; y++){
-	    	world[x][y].resize(SIZE);
-	    	for(int z = 0; z < SIZE; z++){
-	    		if(x%10==0)
-	    		world[x][y][z]=1;
-	    		else
-	    		world[x][y][z]=0;
-	    	}
-	    	
-	    }	
-    }
-    glEnable( GL_DEPTH_TEST );
-    scale = 1.0 /SIZE;
+	glCullFace(GL_FRONT_AND_BACK);
+	//SetUpLightning();
 }
 
 
 
 void calc(){
-	for(int x = 0; x < SIZE; x++){
-	    for(int y = 0; y < SIZE; y++){
-	    	for(int z = 0; z < SIZE; z++){
-	    		//x plus modula operator weil modula sonst nicht richtig berechnet wird
-	    		if(world[((x+SIZE)+1)%SIZE][y][z]==1){
-	    			world[x][y][z] = 1;
-	    		}else{
-	    			world[x][y][z] = 0;
-				}
-	    		
-	    		
-	    		//world[x][y][z] = 12;
-	   		}
-	    }	
-    }
+	
 }
 
+void drawBox() { 
+		// this func just draws a perfectly normal box with some texture coordinates
+		glBegin(GL_QUADS);
+			// Front Face
+			glVertex3f(-1.0f, -1.0f,  1.0f);	
+			glVertex3f( 1.0f, -1.0f,  1.0f);
+			glVertex3f( 1.0f,  1.0f,  1.0f);	
+			glVertex3f(-1.0f,  1.0f,  1.0f);
+			// Back Face
+			glVertex3f(-1.0f, -1.0f, -1.0f);
+			glVertex3f(-1.0f,  1.0f, -1.0f);
+			glVertex3f( 1.0f,  1.0f, -1.0f);	
+			glVertex3f( 1.0f, -1.0f, -1.0f);	
+			// Top Face
+			glVertex3f(-1.0f,  1.0f, -1.0f);
+			glVertex3f(-1.0f,  1.0f,  1.0f);	
+			glVertex3f( 1.0f,  1.0f,  1.0f);	
+			glVertex3f( 1.0f,  1.0f, -1.0f);	
+			// Bottom Face
+			glVertex3f(-1.0f, -1.0f, -1.0f);	
+			glVertex3f( 1.0f, -1.0f, -1.0f);	
+			glVertex3f( 1.0f, -1.0f,  1.0f);	
+			glVertex3f(-1.0f, -1.0f,  1.0f);	
+			// Right face
+			glVertex3f( 1.0f, -1.0f, -1.0f);	
+			glVertex3f( 1.0f,  1.0f, -1.0f);
+			glVertex3f( 1.0f,  1.0f,  1.0f);
+			glVertex3f( 1.0f, -1.0f,  1.0f);	
+			// Left Face
+			glVertex3f(-1.0f, -1.0f, -1.0f);
+			glVertex3f(-1.0f, -1.0f,  1.0f);
+			glVertex3f(-1.0f,  1.0f,  1.0f);
+			glVertex3f(-1.0f,  1.0f, -1.0f);
+		glEnd();
+	}
 
+float angle;
+
+
+void SetUpCamera(){
+	glLoadIdentity();
+	gluLookAt(
+		0, 0, 0, //Position
+		0, 0, 1, //Target
+		0, 1, 0);
+}
 void Renderer::doRender(){
+	SetUpCamera();
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	GLfloat qaLightPosition[]	= {.5, .5, 0.0, 1.0};
+	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
+
+	// Set material properties
+	GLfloat qaBlack[] = {0.0, 0.0, 0.0, 1.0};
+	GLfloat qaGreen[] = {0.0, 1.0, 0.0, 1.0};
+	GLfloat qaWhite[] = {1.0, 1.0, 1.0, 1.0};
+	glMaterialfv(GL_FRONT, GL_AMBIENT, qaGreen);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, qaGreen);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, qaWhite);
+	glMaterialf(GL_FRONT, GL_SHININESS, 60.0);
+
+	// Draw square with many little squares
+	glPushMatrix();
+	glTranslatef(0, 0, 5);
+	glRotated(angle, 0, 1,0);
+	angle += 0.01;
+	GLUquadric *obj = gluNewQuadric();
+	gluSphere(obj, 0.5, 100,100);
 	
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glEnable(GL_DEPTH);
-	glEnable(GL_COLOR);
-	glEnable(GL_POINT_SMOOTH);
-	
-	glPushMatrix ();
-	glTranslatef(-scale * 0.5 * SIZE,-scale * 0.5 * SIZE,-2);//in die mitte schieben
-	
-    //glRotatef (angle, 0.0f, 1.0f, 1.0f);
-    angle += 1;
-    glPointSize(1.0f);
-    glBegin (GL_POINTS);
-    
-    for(int x = 0; x < SIZE; x++){
-	    for(int y = 0; y < SIZE; y++){
-	    	for(int z = 0; z < SIZE; z++){
-	    		//glColor3f(x/(double)SIZE, z/(double)SIZE, y/(double)SIZE);
-	    		if(world[x][y][z]==1){
-	    			glVertex3f(x*scale,y*scale,z*scale);
-	    		}
-	    		
-	    		
-	    		//world[x][y][z] = 12;
-	   		}
-	    }	
-    }
-       
-    
-    glEnd ();
-    glPopMatrix();
-    
- 	beginMotionBlur();
-	endMotionBlur();
-  	calc();
- 
-    
-    
+	glPopMatrix();
 	
 }
+	
