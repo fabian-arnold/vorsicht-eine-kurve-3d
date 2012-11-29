@@ -7,6 +7,7 @@
 #include <gl/glew.h>
 #include <gl/glu.h>
 #include <vector>
+#include "vsShaderLib.h";
 using std::vector;
 
 #define WINWIDTH 1000
@@ -117,6 +118,8 @@ Die welt :
 http://wiki.delphigl.com/index.php/Motion-Blur
 
 */
+
+VSShaderLib shader;
 void SetUpLightning(){
 	// Somewhere in the initialization part of your programm
 	glEnable(GL_LIGHTING);
@@ -137,7 +140,12 @@ void SetUpLightning(){
 
 }
 void Renderer::Init(){
-	glCullFace(GL_FRONT_AND_BACK);
+	glCullFace(GL_BACK);
+	shader.init();
+	shader.loadShader(VSShaderLib::VERTEX_SHADER, "simple.vert");
+	shader.loadShader(VSShaderLib::FRAGMENT_SHADER, "simple.frag");
+	shader.prepareProgram();
+	cout << shader.getAllInfoLogs() << "\n";
 	//SetUpLightning();
 }
 
@@ -214,6 +222,8 @@ void Renderer::doRender(){
 	glTranslatef(0, 0, 5);
 	glRotated(angle, 0, 1,0);
 	angle += 0.01;
+
+	glUseProgram(shader.getProgramIndex());
 	GLUquadric *obj = gluNewQuadric();
 	gluSphere(obj, 0.5, 100,100);
 	

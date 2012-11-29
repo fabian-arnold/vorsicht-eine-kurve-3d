@@ -189,8 +189,8 @@ void EnableOpenGL (HWND hWnd, HDC *hDC, HGLRC *hRC)
 	glClearColor(1.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0);
-
+	//glOrtho(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0);
+	gluPerspective(45.0,width/(double)height,0.00001,100.0);
 	// Lighting set up
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 	glEnable(GL_LIGHTING);
