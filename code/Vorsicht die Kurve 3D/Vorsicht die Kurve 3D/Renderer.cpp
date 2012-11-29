@@ -194,27 +194,36 @@ void drawBox() {
 
 float angle;
 
-
-void SetUpCamera(){
-	glLoadIdentity();
-	gluLookAt(
-		0, 0, 0, //Position
-		0, 0, 1, //Target
-		0, 1, 0);
-}
-
 struct Vector3
 {
 	double x;
 	double y;
 	double z;
 };
+struct Vector5
+{
+	double x;
+	double y;
+	double z;
+	double w;
+	double v;
+};
 
-vector<Vector3> path;
+vector<Vector5> path;
 
 Vector3 position;
 Vector3 direction;
 double speed= 0.001;
+
+void SetUpCamera(){
+	glLoadIdentity();
+	gluLookAt(
+		position.x, position.y-1, position.z-1, //Position
+		position.x+0.5, position.y, position.z+10, //Target
+		0, 1, 0);
+}
+
+
 void Renderer::doRender(){
 	SetUpCamera();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -256,8 +265,8 @@ void Renderer::doRender(){
 	glLineWidth(10.0);
 	glBegin(GL_LINE_STRIP);{
 	
-		for(vector<Vector3>::iterator item =  path.begin(); item !=  path.end(); item++){
-			glVertex3d(item->x, item->y, item->z);
+		for(vector<Vector5>::iterator item =  path.begin(); item !=  path.end(); item++){
+			//glVertex3d(item->x, item->y, item->z);
 		}
 
 	}glEnd();
