@@ -203,7 +203,7 @@ void SetUpCamera(){
 }
 void Renderer::doRender(){
 	SetUpCamera();
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	GLfloat qaLightPosition[]	= {.5, .5, 0.0, 1.0};
 	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
@@ -224,6 +224,7 @@ void Renderer::doRender(){
 	angle += 0.01;
 
 	glUseProgram(shader.getProgramIndex());
+	//drawBox();
 	GLUquadric *obj = gluNewQuadric();
 	gluSphere(obj, 0.5, 100,100);
 	

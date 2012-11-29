@@ -168,6 +168,8 @@ void EnableOpenGL (HWND hWnd, HDC *hDC, HGLRC *hRC)
     /* create and enable the render context (RC) */
     *hRC = wglCreateContext( *hDC );
     wglMakeCurrent( *hDC, *hRC );
+	glewInit();
+	glEnable(GL_DEPTH_TEST);
     
   /* 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 
