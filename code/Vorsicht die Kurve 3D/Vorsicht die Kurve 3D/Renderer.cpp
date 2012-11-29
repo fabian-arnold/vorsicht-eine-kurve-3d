@@ -1,4 +1,5 @@
-﻿#include "Renderer.h"
+﻿#include "Input.h"
+#include "Renderer.h"
 #include <iostream>
 #include <Windows.h>
 #include <vfw.h>
@@ -201,11 +202,24 @@ void SetUpCamera(){
 		0, 0, 1, //Target
 		0, 1, 0);
 }
+
+struct Vector3
+{
+	double x;
+	double y;
+	double z;
+};
+
+vector<Vector3> path;
+
+Vector3 position;
+Vector3 direction;
+double speed= 0.001;
 void Renderer::doRender(){
 	SetUpCamera();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	GLfloat qaLightPosition[]	= {.5, .5, 0.0, 1.0};
+	GLfloat qaLightPosition[]	= {.5, 1, 0.0, 1.0};
 	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
 
 	// Set material properties
@@ -220,13 +234,35 @@ void Renderer::doRender(){
 	// Draw square with many little squares
 	glPushMatrix();
 	glTranslatef(0, 0, 5);
-	glRotated(angle, 0, 1,0);
-	angle += 0.01;
+	//glRotated(angle, 0, 1,0);
+	//angle += 0.01;
+
+	path.push_back(position);
+
+
+	if(GetKeyState('A')& 0x80){
+		direction.x += 0.01;
+	}
+	 if(GetKeyState('D')& 0x80){
+		direction.x -= 0.01;
+	}
+
+	position.x += cos(direction.x)*speed;
+	position.y += sin(direction.x)*speed;
 
 	glUseProgram(shader.getProgramIndex());
 	//drawBox();
-	GLUquadric *obj = gluNewQuadric();
-	gluSphere(obj, 0.5, 100,100);
+	//GLUquadric *obj = gluNewQuadric();
+	glLineWidth(10.0);
+	glBegin(GL_LINE_STRIP);{
+	
+		for(vector<Vector3>::iterator item =  path.begin(); item !=  path.end(); item++){
+			glVertex3d(item->x, item->y, item->z);
+		}
+
+	}glEnd();
+
+	//gluSphere(obj, 0.5, 100,100);
 	
 	glPopMatrix();
 	
