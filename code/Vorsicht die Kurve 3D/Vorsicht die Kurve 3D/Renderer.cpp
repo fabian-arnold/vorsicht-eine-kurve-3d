@@ -217,12 +217,37 @@ double speed= 0.001;
 
 void SetUpCamera(){
 	glLoadIdentity();
+	
 	gluLookAt(
-		position.x, position.y-1, position.z-1, //Position
-		position.x+0.5, position.y, position.z+10, //Target
+		position.x, position.y, position.z-10, //Position
+		position.x, position.y, position.z, //Target
 		0, 1, 0);
+	
 }
 
+
+void DrawAxes()
+{
+	// X - Axis red
+	glBegin(GL_LINES);
+	glColor3f(1.0f, 0.0f, 0.0f);
+
+	glVertex3f(-5.0f, 0.0f, 0.0f);
+	glVertex3f(5.0f, 0.0f, 0.0f);
+	glEnd();
+	// Y - Axis green
+	glBegin(GL_LINES);
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0f, -5.0f, 0.0f);
+	glVertex3f(0.0f, 5.0f, 0.0f);
+	glEnd();
+	// Z - Axis blue
+	glBegin(GL_LINES);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 5.0f);
+	glVertex3f(0.0f, 0.0f, -5.0f);
+	glEnd();
+}
 
 void Renderer::doRender(){
 	SetUpCamera();
@@ -239,39 +264,43 @@ void Renderer::doRender(){
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, qaGreen);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, qaWhite);
 	glMaterialf(GL_FRONT, GL_SHININESS, 60.0);
-
+	DrawAxes();
 	// Draw square with many little squares
 	glPushMatrix();
-	glTranslatef(0, 0, 5);
+	//glTranslatef(0, 0, 5);
 	//glRotated(angle, 0, 1,0);
 	//angle += 0.01;
 
-	path.push_back(position);
+	//path.push_back(position);
 
+	
 
 	if(GetKeyState('A')& 0x80){
-		direction.x += 0.01;
+		direction.x -= 0.001;
 	}
 	 if(GetKeyState('D')& 0x80){
-		direction.x -= 0.01;
+		direction.x += 0.001;
 	}
-
+	
 	position.x += cos(direction.x)*speed;
 	position.y += sin(direction.x)*speed;
 
 	glUseProgram(shader.getProgramIndex());
 	//drawBox();
-	//GLUquadric *obj = gluNewQuadric();
+	//
 	glLineWidth(10.0);
-	glBegin(GL_LINE_STRIP);{
-	
-		for(vector<Vector5>::iterator item =  path.begin(); item !=  path.end(); item++){
+	//glBegin(GL_LINE_STRIP);{
+	glPushMatrix();
+		//for(vector<Vector5>::iterator item =  path.begin(); item !=  path.end(); item++){
+			glTranslated(position.x,position.y, position.z);
+			GLUquadric *obj = gluNewQuadric();
+			gluSphere(obj, 0.1, 20,20);
 			//glVertex3d(item->x, item->y, item->z);
-		}
+		//}
+		glPopMatrix();
+	//}glEnd();
 
-	}glEnd();
-
-	//gluSphere(obj, 0.5, 100,100);
+	//
 	
 	glPopMatrix();
 	
